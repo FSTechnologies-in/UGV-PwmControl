@@ -40,7 +40,6 @@ void loop() {
       if(currentMillis-sig_started>=pwm_interval)
       {
         sig_started=currentMillis;
-        //digitalWrite(LED_BUILTIN, HIGH);
          if(speed_left<lPwm)
          {
           pwmWrite(L_PWM, speed_left);
@@ -77,14 +76,14 @@ void loop() {
     }
  /* Read the limit switch status is High to low for changing the state of break condition */
     limit_sw_State = digitalRead(limit_switch);
-  /* when limit switch is pressed limit switch state publish to break node
+  /* when limit switch is pressed limit switch state publish to break node*/
   if(limit_sw_State==HIGH)
     {
       if(limit_flag)
       {
         limit_flag=0;
        switch_data.data = true;
-       limit_sw.publish(&switch_data);
+       limit_sw.publish(&switch_data);// limit switch data is true publish to brake wheel node
       }
     }
     else
@@ -105,15 +104,15 @@ void onTwist(const geometry_msgs::Twist &msg)
   linear_velocity_ref  = msg.linear.x;
   angular_velocity_ref = msg.angular.z;
   /* find the left and right motor how much distance should be travel */
-  float l = (msg.linear.x - msg.angular.z) / 2;
-  float r = (msg.linear.x + msg.angular.z) / 2;
+  float left_motors_pwm = (msg.linear.x - msg.angular.z) / 2;
+  float right_motors_pwm = (msg.linear.x + msg.angular.z) / 2;
   /* setting the direction of motor */
-  digitalWrite(left_relay, l<0);
-  digitalWrite(right_relay, r<0);
+  digitalWrite(left_relay, left_motors_pwm<0);
+  digitalWrite(right_relay, right_motors_pwm<0);
   
   // Then map those values to PWM intensities. PWMRANGE = full speed, while PWM_MIN = the minimal amount of power at which the motors begin moving.
-   lPwm = mapPwm(fabs(l), PWM_MIN, PWMRANGE);
-   rPwm = mapPwm(fabs(r), PWM_MIN, PWMRANGE);
+   lPwm = mapPwm(fabs(left_motors_pwm), PWM_MIN, PWMRANGE);
+   rPwm = mapPwm(fabs(right_motors_pwm), PWM_MIN, PWMRANGE);
   // Debug the linear value
 //    mySerial.print("Linear:");
 //  mySerial.println(msg.linear.x);
