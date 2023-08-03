@@ -14,7 +14,7 @@ float mapPwm(float x, float out_min, float out_max);// Mapping pwm function
 
 
 /*
-Settiup all GPIOs 
+Setup all GPIOs 
 GPIO2------> Right Direction Relay
 GPIO4------> Left Direction Relay
 GPIO9-------> Right pwm
@@ -34,7 +34,6 @@ uint16_t rPwm;
 float linear_velocity_ref;
 float angular_velocity_ref;
 
-uint8_t d_flag=0; // direction flag
 uint8_t speed_right=25,speed_left=25; // speed increase variable
 uint8_t stflag=0; //stop flag
 uint8_t limit_flag=0;//limit switch flag
