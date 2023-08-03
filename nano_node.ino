@@ -8,6 +8,7 @@
 #include "config.h"
 #include <SoftwareSerial.h> // Debug serial
 SoftwareSerial mySerial(6, 7); // RX, TX
+void onTwist(const geometry_msgs::Twist &msg);
 /* Initialize node handle for ros communication */ 
 ros::NodeHandle node;
 std_msgs::Bool switch_data;// limit switch data publish to break node
@@ -21,9 +22,11 @@ void setup() {
   InitTimersSafe();
   bool success = SetPinFrequencySafe(L_PWM, frequency_left); // set pwm frequency for left side motor
   SetPinFrequencySafe(R_PWM, frequency_right);// set pwm frequency for left side motor
-
+  node.getHardware()->setBaud(115200);
   node.initNode(); // ros node intialize
   node.subscribe(sub); //subcribe joystick value
+  node.advertise(limit_sw); //subcribe joystick value
+
 }
 
 void loop() {
@@ -36,9 +39,11 @@ void loop() {
   
   if(linear_velocity_ref) 
   {
+    node.spinOnce();
       digitalWrite(LED_BUILTIN, HIGH);
       if(currentMillis-sig_started>=pwm_interval)
       {
+        
         sig_started=currentMillis;
          if(speed_left<lPwm)
          {
@@ -77,7 +82,7 @@ void loop() {
  /* Read the limit switch status is High to low for changing the state of break condition */
     limit_sw_State = digitalRead(limit_switch);
   /* when limit switch is pressed limit switch state publish to break node*/
-  if(limit_sw_State==HIGH)
+  if(limit_sw_State==LOW)
     {
       if(limit_flag)
       {
@@ -89,7 +94,7 @@ void loop() {
     else
     {
       limit_flag=1;
-      delay(50);
+      delay(20);
       }
   
   
