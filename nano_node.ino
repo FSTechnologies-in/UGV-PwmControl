@@ -12,12 +12,8 @@ SoftwareSerial mySerial(6, 7); // RX, TX
 ros::NodeHandle node;
 std_msgs::Bool switch_data;// limit switch data publish to break node
 ros::Subscriber<geometry_msgs::Twist> sub("/linear/angular", &onTwist);// command velocity subscribe topic creation
-ros::Publisher limit_sw("/brake/limit_switch",&switch_data);
-/*
-set time interval for acheive respective delay
---> PWM 
---> break
-*/
+ros::Publisher limit_sw("/brake/limit_switch",&switch_data);// creating limit switch publish topic 
+
 void setup() {
   setupPins(); // gpio pins initialize
    mySerial.begin(9600);// baudrate for debug serial communcation
