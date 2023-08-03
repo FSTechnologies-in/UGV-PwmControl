@@ -35,7 +35,6 @@ float linear_velocity_ref;
 float angular_velocity_ref;
 
 uint8_t speed_right=25,speed_left=25; // speed increase variable
-uint8_t stflag=0; //stop flag
 uint8_t limit_flag=0;//limit switch flag
 typedef enum {ZERO,ONE,TWO,THREE,FOUR,FIVE}number;
 
