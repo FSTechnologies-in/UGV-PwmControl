@@ -5,7 +5,7 @@
 #include <geometry_msgs/Twist.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/Int16.h>
-
+#include "config.h"
 #include <SoftwareSerial.h> // Debug serial
 SoftwareSerial mySerial(6, 7); // RX, TX
 /* Initialize node handle for ros communication */ 
