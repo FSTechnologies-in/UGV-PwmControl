@@ -11,9 +11,8 @@ SoftwareSerial mySerial(6, 7); // RX, TX
 void onTwist(const geometry_msgs::Twist &msg);
 /* Initialize node handle for ros communication */ 
 ros::NodeHandle node;
-std_msgs::Bool switch_data;// limit switch data publish to break node
 ros::Subscriber<geometry_msgs::Twist> sub("/linear/angular", &onTwist);// command velocity subscribe topic creation
-ros::Publisher limit_sw("/brake/limit_switch",&switch_data);// creating limit switch publish topic 
+ 
 
 void setup() {
   setupPins(); // gpio pins initialize
@@ -25,7 +24,6 @@ void setup() {
   node.getHardware()->setBaud(115200);
   node.initNode(); // ros node intialize
   node.subscribe(sub); //subcribe joystick value
-  node.advertise(limit_sw); //subcribe joystick value
 
 }
 
@@ -79,25 +77,6 @@ void loop() {
     pwmWrite(R_PWM, 0);
     digitalWrite(LED_BUILTIN, LOW);
     }
- /* Read the limit switch status is High to low for changing the state of break condition */
-    limit_sw_State = digitalRead(limit_switch);
-  /* when limit switch is pressed limit switch state publish to break node*/
-  if(limit_sw_State==LOW)
-    {
-      if(limit_flag)
-      {
-        limit_flag=0;
-       switch_data.data = true;
-       limit_sw.publish(&switch_data);// limit switch data is true publish to brake wheel node
-      }
-    }
-    else
-    {
-      limit_flag=1;
-      delay(20);
-      }
-  
-  
     node.spinOnce();// where all of the ROS communication callbacks are handled
 
 
