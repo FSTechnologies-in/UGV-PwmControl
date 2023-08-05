@@ -1,7 +1,7 @@
 // The min amount of PWM the motors need to move. Depends on the battery, motors and controller.
 // The max amount is defined by PWMRANGE in Arduino.h
-int PWM_MIN 60 // Minimum pwm
-int PWMRANGE 120 //maximum pwm
+int PWM_MIN= 60; // Minimum pwm
+int PWMRANGE= 120; //maximum pwm
 uint16_t frequency_right = 380; //frequency (in Hz)
 uint16_t frequency_left = 400; //frequency (in Hz)
 
@@ -32,6 +32,7 @@ uint16_t lPwm;
 uint16_t rPwm;
 
 long sig_started=0;
+long sig_started_dec=0;
 long pwm_interval=50;
 /* Industrial pc publish linear and angular value store in below variable to access through out program*/
 float linear_velocity_ref;
