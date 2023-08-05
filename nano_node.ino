@@ -1,3 +1,4 @@
+
 /* Header files Include for PWM, ros and Geometry message, Boolean,Integer */
 #include <PWM.h>
 #include <math.h>
@@ -9,15 +10,16 @@
 #include <SoftwareSerial.h> // Debug serial
 SoftwareSerial mySerial(6, 7); // RX, TX
 void onTwist(const geometry_msgs::Twist &msg);
-void low_pwm(const std_msgs::Bool &msg);
-void medium_pwm(const std_msgs::Bool &msg);
-void high_pwm(const std_msgs::Bool &msg);
+void low_pwm(const std_msgs::Int16 &msg);
+void medium_pwm(const std_msgs::Int16 &msg);
+void high_pwm(const std_msgs::Int16 &msg);
 /* Initialize node handle for ros communication */ 
+
 ros::NodeHandle node;
 ros::Subscriber<geometry_msgs::Twist> sub("/linear/angular", &onTwist);// command velocity subscribe topic creation
-ros::Subscriber<std_msgs::Bool> pwm_1("/pwm/low", &low_pwm);// low pwm subscribe topic creation
-ros::Subscriber<std_msgs::Bool> pwm_2("/pwm/medium", &medium_pwm);// medium pwm subscribe topic creation
-ros::Subscriber<std_msgs::Bool> pwm_3("/pwm/high", &high_pwm);// high pwm subscribe topic creation
+ros::Subscriber<std_msgs::Int16> pwm_1("/pwm/low/joystick", &low_pwm);// low pwm subscribe topic creation
+ros::Subscriber<std_msgs::Int16> pwm_2("/pwm/medium/joystick", &medium_pwm);// medium pwm subscribe topic creation
+ros::Subscriber<std_msgs::Int16> pwm_3("/pwm/high/joystick", &high_pwm);// high pwm subscribe topic creation
 void setup() {
   setupPins(); // gpio pins initialize
    mySerial.begin(9600);// baudrate for debug serial communcation
@@ -44,7 +46,6 @@ void loop() {
   if(linear_velocity_ref) 
   {
     node.spinOnce();
-      digitalWrite(LED_BUILTIN, HIGH);
       if(currentMillis-sig_started>=pwm_interval)
       {
         
@@ -74,14 +75,33 @@ void loop() {
   
    }
   }
- /* When it is joystick value as zero, The motor speed is zero and motor doesnot run as well */    
+ /* When it is joystick value as zero, The motor speed is zero and motor doesnot run as well */   
+  
    else
    {
+    
+    node.spinOnce();
+      if(currentMillis-sig_started>=pwm_interval)
+      {
+        
+        sig_started_dec=currentMillis;
+        
+         if(speed_left<lPwm)
+         {
+          pwmWrite(L_PWM, speed_left);
+          speed_left--;
+         }
+        
+         if(speed_right<rPwm)
+         {
+          pwmWrite(R_PWM, speed_right);
+          speed_right--;
+         }
+       }
+         // node.spinOnce();// where all of the ROS communication callbacks are handled
+    digitalWrite(LED_BUILTIN, LOW);
     speed_left=25;
     speed_right=25;
-    pwmWrite(L_PWM, 0);
-    pwmWrite(R_PWM, 0);
-    digitalWrite(LED_BUILTIN, LOW);
     }
     node.spinOnce();// where all of the ROS communication callbacks are handled
 
@@ -108,41 +128,22 @@ void onTwist(const geometry_msgs::Twist &msg)
 //  mySerial.println(msg.linear.x);
 
 }
-void low_pwm(const std_msgs::Bool &msg)
+void low_pwm(const std_msgs::Int16 &msg)
 {
-    int pwm_value = msg.data;
-   if(pwm_value == 1)
-   {
-      PWMRANGE = 70;
-   }
-   if(pwm_value == 0)
-   {
-      PWMRANGE = 0;
-   }
+    digitalWrite(LED_BUILTIN, HIGH);
+
+    PWMRANGE = msg.data;
+  
 }
-void medium_pwm(const std_msgs::Bool &msg)
+void medium_pwm(const std_msgs::Int16 &msg)
 {
-   int pwm_value = msg.data;
-   if(pwm_value == 1)
-   {
-      PWMRANGE = 90;
-   }
-   if(pwm_value == 0)
-   {
-      PWMRANGE = 0;
-   }
+    PWMRANGE = msg.data;
+   
 }
-void high_pwm(const std_msgs::Bool &msg)
+void high_pwm(const std_msgs::Int16 &msg)
 {
-    int pwm_value = msg.data;
-   if(pwm_value == 1)
-   {
-      PWMRANGE = 120;
-   }
-   if(pwm_value == 0)
-   {
-      PWMRANGE = 0;
-   }
+     PWMRANGE = msg.data;
+   
 }
    
    
